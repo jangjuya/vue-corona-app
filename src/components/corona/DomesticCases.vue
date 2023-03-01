@@ -1,0 +1,130 @@
+<template>
+  <div>
+    <ul class="graph-list">
+      <li>
+        <h3>누적 확진/사망자 추이</h3>
+        <ChartGragh :chartOptions="domesticCases" :key="caseKey" />
+      </li>
+      <li>
+        <h3>확진자 대비 사망자</h3>
+        <ChartGragh :chartOptions="domesticCompare" :key="compareKey" />
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script>
+import ChartGragh from "../charts/ChartGragh.vue";
+import coronaMixin from "@/mixins/coronaMixin";
+import moment from "moment";
+export default {
+  name: "DomasticCases",
+  mixins: [coronaMixin],
+  components: { ChartGragh },
+  data() {
+    return {
+      caseKey: 0,
+      compareKey: 0,
+      monthDifference: 4,
+      domesticData: [],
+    };
+  },
+  computed: {
+    domesticCases() {
+      return {
+        type: "line",
+        labels: this.domesticData.map((dom) =>
+          dom.Date.split("T")[0].substr(0, 7)
+        ),
+        datasets: [
+          {
+            label: "확진자",
+            data: this.domesticData.map((dom) => dom.Confirmed),
+            borderWidth: 1,
+            backgroundColor: ["rgba(54,162,235,0.2)"],
+            borderColor: ["rgba(54,162,235,1)"],
+          },
+          {
+            label: "사망자",
+            data: this.domesticData.map((dom) => dom.Deaths),
+            borderWidth: 1,
+            backgroundColor: ["rgba(255,99,132,0.2)"],
+            borderColor: ["rgba(255,99,132,1)"],
+          },
+        ],
+      };
+    },
+    domesticCompare() {
+      const lastMonth = this.domesticData[this.domesticData.length - 1] || {};
+      const deaths = lastMonth.Deaths;
+      const confirmed = lastMonth.Confirmed;
+      const data = [deaths, confirmed];
+      return {
+        type: "doughnut",
+        labels: ["사망자", "확진자"],
+        datasets: [
+          {
+            label: "확진자 재비 사망자",
+            data,
+            boederWidth: 1,
+            backgroundColor: ["rgba(255,99,132,0.2)", "rgba(54,162,235,0.2)"],
+            borderColor: ["rgba(255,99,132,1)", "rgba(54,162,235,1)"],
+          },
+        ],
+      };
+    },
+  },
+  watch: {
+    domesticCases: {
+      handler() {
+        this.caseKey++;
+      },
+    },
+    domesticCompare: {
+      handler() {
+        this.compareKey++;
+      },
+    },
+  },
+  mounted() {
+    this.fetchDomestic();
+  },
+  methods: {
+    async fetchDomestic() {
+      const to = moment().format("YYYY-MM-DD");
+      const from = moment()
+        .subtract(this.monthDifference, "months")
+        .format("YYYY-MM-DD");
+      const params = {
+        to,
+        from,
+      };
+      const url = "https://api.covid19api.com/live/country/south-korea";
+      const domestic = await this.fetchData("get", url, params);
+      this.setDomesticData(domestic);
+    },
+    setDomesticData(domestic) {
+      let pick = 0;
+      const targetDates = [];
+      while (pick < this.monthDifference) {
+        targetDates.push(
+          moment().subtract(pick, "months").utc().format().split("T")[0]
+        );
+        pick++;
+      }
+      this.domesticData = domestic.filter((dom) =>
+        targetDates.includes(dom.Date.split("T")[0])
+      );
+    },
+  },
+};
+</script>
+
+<style scoped>
+.graph-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 1em;
+  list-style: none;
+}
+</style>
