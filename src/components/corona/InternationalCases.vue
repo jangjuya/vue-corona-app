@@ -7,7 +7,7 @@
           v-for="(item, index) in displayTypes"
           :key="index"
           :label="index"
-          >{{ item.alies }}
+          >{{ item.alias }}
         </el-radio-button>
       </el-radio-group>
       <input type="text" v-model="keyword" />
@@ -42,10 +42,10 @@ export default {
       keyword: "",
       displayType: 0,
       displayTypes: [
-        { alies: "Daily Worst", key: "NewConfirmed", compare: -1 },
-        { alies: "Daily Best", key: "NewConfirmed", compare: -1 },
-        { alies: "Total Worst", key: "TotalConfirmed", compare: -1 },
-        { alies: "Total Best", key: "TotalConfirmed", compare: -1 },
+        { alias: "Daily Worst", key: "NewConfirmed", compare: -1 },
+        { alias: "Daily Best", key: "NewConfirmed", compare: 1 },
+        { alias: "Total Worst", key: "TotalConfirmed", compare: -1 },
+        { alias: "Total Best", key: "TotalConfirmed", compare: 1 },
       ],
     };
   },

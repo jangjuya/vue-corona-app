@@ -6,7 +6,7 @@
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 export default {
-  name: "chartGraph",
+  name: "ChartGraph",
   props: {
     chartOptions: {
       type: Object,
@@ -45,7 +45,7 @@ export default {
   methods: {
     drawChart() {
       const { type, datasets, labels, options } = this.chartOptions;
-      const ctx = this.$refs.myChart;
+      const ctx = this.$refs.myChart.getContext("2d");
       this.chartObject = new Chart(ctx, {
         type: type,
         data: {

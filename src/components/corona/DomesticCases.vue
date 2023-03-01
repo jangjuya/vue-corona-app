@@ -3,24 +3,24 @@
     <ul class="graph-list">
       <li>
         <h3>누적 확진/사망자 추이</h3>
-        <ChartGragh :chartOptions="domesticCases" :key="caseKey" />
+        <ChartGraph :chartOptions="domesticCases" :key="caseKey" />
       </li>
       <li>
         <h3>확진자 대비 사망자</h3>
-        <ChartGragh :chartOptions="domesticCompare" :key="compareKey" />
+        <ChartGraph :chartOptions="domesticCompare" :key="compareKey" />
       </li>
     </ul>
   </div>
 </template>
 
 <script>
-import ChartGragh from "../charts/ChartGragh.vue";
+import ChartGraph from "../charts/ChartGraph.vue";
 import coronaMixin from "@/mixins/coronaMixin";
 import moment from "moment";
 export default {
   name: "DomasticCases",
   mixins: [coronaMixin],
-  components: { ChartGragh },
+  components: { ChartGraph },
   data() {
     return {
       caseKey: 0,
@@ -64,7 +64,7 @@ export default {
         labels: ["사망자", "확진자"],
         datasets: [
           {
-            label: "확진자 재비 사망자",
+            label: "확진자 대비 사망자",
             data,
             boederWidth: 1,
             backgroundColor: ["rgba(255,99,132,0.2)", "rgba(54,162,235,0.2)"],
@@ -79,11 +79,13 @@ export default {
       handler() {
         this.caseKey++;
       },
+      deep: true,
     },
     domesticCompare: {
       handler() {
         this.compareKey++;
       },
+      deep: true,
     },
   },
   mounted() {
